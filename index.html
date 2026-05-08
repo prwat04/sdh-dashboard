@@ -32,14 +32,27 @@
   body { font-family: 'Sarabun', sans-serif; background: var(--bg-main); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
 
   .header { background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 60%, #0F4C81 100%); padding: 0 32px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.2); }
-  .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 68px; }
-  .header-left { display: flex; align-items: center; gap: 16px; }
+  .header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 12px; }
+  .header-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
   .pea-logo { width: 44px; height: 44px; background: var(--pea-red); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: white; letter-spacing: -0.5px; flex-shrink: 0; }
-  .header-title { color: white; }
+  .header-title { color: white; min-width: 0; }
   .header-title h1 { font-size: 16px; font-weight: 700; line-height: 1.2; }
   .header-title p { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.6); }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .last-update { font-size: 12px; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+  .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .last-update { font-size: 12px; color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.12); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); font-weight: 600; white-space: nowrap; }
+  @media(max-width:640px){
+    .header { padding: 10px 14px; }
+    .header-inner { flex-wrap: wrap; height: auto; gap: 8px; }
+    .header-left { flex: 1; gap: 10px; order: 0; }
+    .header-right { order: 1; }
+    .search-wrap { order: 2; width: 100% !important; }
+    .pea-logo { width: 36px; height: 36px; font-size: 12px; }
+    .header-title h1 { font-size: 13px; }
+    .header-title p { font-size: 9px; }
+    .last-update { font-size: 11px; padding: 4px 10px; }
+    .search-box { width: 100% !important; }
+    .search-dropdown { width: 100% !important; right: 0; left: 0; }
+  }
 
   .breadcrumb { max-width: 1400px; margin: 0 auto; padding: 16px 32px 0; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
   .breadcrumb span { cursor: pointer; transition: color 0.2s; }
@@ -256,15 +269,15 @@
       </div>
     </div>
     <div class="header-right">
-      <div class="search-wrap" id="search-wrap">
-        <div class="search-box" id="search-box">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="ค้นหาสำนักงาน / สถานีไฟฟ้า..." autocomplete="off" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)"/>
-          <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
-        </div>
-        <div class="search-dropdown" id="search-dropdown"></div>
+      <div class="last-update" id="last-update-badge">อัพเดทล่าสุด: 7 พ.ค. 2569</div>
+    </div>
+    <div class="search-wrap" id="search-wrap">
+      <div class="search-box" id="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="ค้นหา สฟฟ./สนง." autocomplete="off" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)"/>
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
       </div>
-      <div class="last-update">อัพเดทล่าสุด: 7 พ.ค. 2569</div>
+      <div class="search-dropdown" id="search-dropdown"></div>
     </div>
   </div>
 </div>

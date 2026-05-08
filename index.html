@@ -484,19 +484,40 @@ function rebuildOverviewHTML() {
           <span class="card-title">รายการตามสถานะ</span>
           <span class="card-badge" id="status-count-badge">-</span>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
           <button class="status-tab active" data-tab="done" onclick="switchTab('done')">
-            <span class="tab-dot" style="background:#10B981"></span>ดำเนินการแล้วเสร็จ
+            <span class="tab-dot" style="background:#10B981"></span>ดำเนินการแล้วเสร็จทุกขั้นตอน
             <span class="tab-count" id="tab-count-done"></span>
           </button>
-          <button class="status-tab" data-tab="in-progress" onclick="switchTab('in-progress')">
-            <span class="tab-dot" style="background:#F97316"></span>อยู่ระหว่างดำเนินการ
-            <span class="tab-count" id="tab-count-in-progress"></span>
+          <button class="status-tab" data-tab="s0" onclick="switchTab('s0')">
+            <span class="tab-dot" style="background:#64748B"></span>สำรวจ
+            <span class="tab-count" id="tab-count-s0"></span>
           </button>
-          <button class="status-tab" data-tab="pending" onclick="switchTab('pending')">
-            <span class="tab-dot" style="background:#CBD5E1"></span>ยังไม่ดำเนินการ
-            <span class="tab-count" id="tab-count-pending"></span>
+          <button class="status-tab" data-tab="s1" onclick="switchTab('s1')">
+            <span class="tab-dot" style="background:#64748B"></span>รื้อถอน
+            <span class="tab-count" id="tab-count-s1"></span>
           </button>
+          <button class="status-tab" data-tab="s2" onclick="switchTab('s2')">
+            <span class="tab-dot" style="background:#64748B"></span>ขออนุมัติ
+            <span class="tab-count" id="tab-count-s2"></span>
+          </button>
+          <button class="status-tab" data-tab="s3" onclick="switchTab('s3')">
+            <span class="tab-dot" style="background:#64748B"></span>ขายทอดตลาด
+            <span class="tab-count" id="tab-count-s3"></span>
+          </button>
+          <button class="status-tab" data-tab="s4" onclick="switchTab('s4')">
+            <span class="tab-dot" style="background:#64748B"></span>นำออกบัญชี
+            <span class="tab-count" id="tab-count-s4"></span>
+          </button>
+        </div>
+        <div id="step-toggle-row" style="display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 12px;background:var(--bg-subtle);border-radius:10px;border:1px solid var(--border);">
+          <span style="font-size:12px;color:var(--text-secondary);">แสดงเฉพาะที่</span>
+          <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex-shrink:0;">
+            <input type="checkbox" id="step-toggle" onchange="onToggleChange()" style="opacity:0;width:0;height:0;position:absolute;">
+            <span id="toggle-slider" style="position:absolute;top:0;left:0;right:0;bottom:0;border-radius:99px;background:#CBD5E1;transition:0.2s;"></span>
+            <span id="toggle-thumb" style="position:absolute;width:16px;height:16px;left:3px;top:3px;border-radius:50%;background:white;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
+          </label>
+          <span id="toggle-label-text" style="font-size:12px;font-weight:700;color:#F97316;">ยังไม่เสร็จ + ยังไม่เริ่ม</span>
         </div>
         <div id="status-list" style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:340px;"></div>
       </div>

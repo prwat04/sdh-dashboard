@@ -381,13 +381,17 @@ function statusToStep(val) {
 }
 
 function rowToLoc(row, prefix, idx) {
-  // A=0 (running no), B=1 (ชื่อ), C=2 (จังหวัด), D=3, E=4 (จำนวน), F=5 (มูลค่า), G=6..K=10
+  // Sheet structure (0-based index):
+  // A=0 (no), B=1 (ชื่อ), C=2 (สังกัด), D=3 (ตัวย่อ), E=4 (จำนวน), F=5 (มูลค่า), G=6..K=10 (steps)
   const name     = (row[1]||'').trim();
-  const province = (row[2]||'').trim();
+  const province = (row[2]||'').trim(); // สังกัด ใช้แทนจังหวัดก่อน
   const assets   = parseInt((row[4]||'0').replace(/,/g,''))||0;
-  // มูลค่า: เก็บตัวเลขล้วน แล้ว format ใส่ comma ตอน display
-  const rawVal   = (row[5]||'').trim().replace(/,/g,'').replace(/"/g,'');
-  const value    = rawVal && !isNaN(rawVal) ? Number(rawVal).toLocaleString('th-TH') : '-';
+  // มูลค่า: ตัด comma และ quotes แล้ว parseFloat รองรับทศนิยม
+  const rawVal   = (row[5]||'').replace(/"/g,'').replace(/,/g,'').trim();
+  const numVal   = parseFloat(rawVal);
+  const value    = !isNaN(numVal) && numVal > 0
+    ? Math.round(numVal).toLocaleString('th-TH')
+    : '-';
   const steps    = [row[6],row[7],row[8],row[9],row[10]].map(statusToStep);
   const note     = [row[6],row[7],row[8],row[9],row[10]].map(v=>(v||'ยังไม่ดำเนินการ').trim());
   if(!name) return null;

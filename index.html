@@ -304,21 +304,42 @@
       <div class="card" style="display:flex;flex-direction:column;">
         <div class="card-header" style="margin-bottom:14px;">
           <span class="card-title">รายการตามสถานะ</span>
-          <span class="card-badge" id="status-count-badge">59 แห่ง</span>
+          <span class="card-badge" id="status-count-badge">-</span>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
           <button class="status-tab active" data-tab="done" onclick="switchTab('done')">
-            <span class="tab-dot" style="background:#10B981"></span>ดำเนินการแล้วเสร็จ
+            <span class="tab-dot" style="background:#10B981"></span>ดำเนินการแล้วเสร็จทุกขั้นตอน
             <span class="tab-count" id="tab-count-done"></span>
           </button>
-          <button class="status-tab" data-tab="in-progress" onclick="switchTab('in-progress')">
-            <span class="tab-dot" style="background:#F97316"></span>อยู่ระหว่างดำเนินการ
-            <span class="tab-count" id="tab-count-in-progress"></span>
+          <button class="status-tab" data-tab="s0" onclick="switchTab('s0')">
+            <span class="tab-dot" style="background:#64748B"></span>สำรวจ
+            <span class="tab-count" id="tab-count-s0"></span>
           </button>
-          <button class="status-tab" data-tab="pending" onclick="switchTab('pending')">
-            <span class="tab-dot" style="background:#CBD5E1"></span>ยังไม่ดำเนินการ
-            <span class="tab-count" id="tab-count-pending"></span>
+          <button class="status-tab" data-tab="s1" onclick="switchTab('s1')">
+            <span class="tab-dot" style="background:#64748B"></span>รื้อถอน
+            <span class="tab-count" id="tab-count-s1"></span>
           </button>
+          <button class="status-tab" data-tab="s2" onclick="switchTab('s2')">
+            <span class="tab-dot" style="background:#64748B"></span>ขออนุมัติ
+            <span class="tab-count" id="tab-count-s2"></span>
+          </button>
+          <button class="status-tab" data-tab="s3" onclick="switchTab('s3')">
+            <span class="tab-dot" style="background:#64748B"></span>ขายทอดตลาด
+            <span class="tab-count" id="tab-count-s3"></span>
+          </button>
+          <button class="status-tab" data-tab="s4" onclick="switchTab('s4')">
+            <span class="tab-dot" style="background:#64748B"></span>นำออกบัญชี
+            <span class="tab-count" id="tab-count-s4"></span>
+          </button>
+        </div>
+        <div id="step-toggle-row" style="display:none;align-items:center;gap:10px;margin-bottom:12px;padding:8px 12px;background:var(--bg-subtle);border-radius:10px;border:1px solid var(--border);">
+          <span style="font-size:12px;color:var(--text-secondary);">แสดงเฉพาะที่</span>
+          <label style="position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;flex-shrink:0;">
+            <input type="checkbox" id="step-toggle" onchange="onToggleChange()" style="opacity:0;width:0;height:0;position:absolute;">
+            <span id="toggle-slider" style="position:absolute;top:0;left:0;right:0;bottom:0;border-radius:99px;background:#CBD5E1;transition:0.2s;"></span>
+            <span id="toggle-thumb" style="position:absolute;width:16px;height:16px;left:3px;top:3px;border-radius:50%;background:white;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>
+          </label>
+          <span id="toggle-label-text" style="font-size:12px;font-weight:700;color:#F97316;">ยังไม่เสร็จ + ยังไม่เริ่ม</span>
         </div>
         <div id="status-list" style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:340px;"></div>
       </div>
@@ -649,15 +670,57 @@ function renderStepSection() {
 }
 
 let currentTab='done';
+let stepToggleOn=false; // false = แสดงยังไม่เสร็จ, true = แสดงแล้วเสร็จ
+
+const STEP_TABS = ['s0','s1','s2','s3','s4'];
+
+function getStepIdx(tab){ return parseInt(tab.replace('s','')); }
+
 function getTabData(tab) {
-  return [...offices.map(o=>({...o,type:'office'})),...stations.map(s=>({...s,type:'station'}))]
-    .filter(l=>{const p=calcPct(l.steps); return tab==='done'?p===100:tab==='pending'?p===0:p>0&&p<100;})
-    .sort((a,b)=>currentTab==='pending'?a.name.localeCompare(b.name,'th'):calcPct(b.steps)-calcPct(a.steps));
+  const all=[...offices.map(o=>({...o,type:'office'})),...stations.map(s=>({...s,type:'station'}))];
+  if(tab==='done') return all.filter(l=>calcPct(l.steps)===100).sort((a,b)=>a.name.localeCompare(b.name,'th'));
+  const si=getStepIdx(tab);
+  return all.filter(l=> stepToggleOn ? l.steps[si]===2 : l.steps[si]<2)
+            .sort((a,b)=>calcPct(b.steps)-calcPct(a.steps));
 }
-function renderStatusTabs() {
-  ['done','in-progress','pending'].forEach(t=>{ document.getElementById('tab-count-'+t).textContent=getTabData(t).length; });
+
+function onToggleChange(){
+  const chk=document.getElementById('step-toggle');
+  stepToggleOn=chk.checked;
+  const slider=document.getElementById('toggle-slider');
+  const thumb=document.getElementById('toggle-thumb');
+  const lbl=document.getElementById('toggle-label-text');
+  if(stepToggleOn){
+    slider.style.background='#10B981';
+    thumb.style.transform='translateX(16px)';
+    lbl.textContent='แล้วเสร็จ';
+    lbl.style.color='#10B981';
+  } else {
+    slider.style.background='#CBD5E1';
+    thumb.style.transform='translateX(0)';
+    lbl.textContent='ยังไม่เสร็จ + ยังไม่เริ่ม';
+    lbl.style.color='#F97316';
+  }
+  updateAllTabCounts();
   renderStatusList();
 }
+
+function updateAllTabCounts(){
+  // tab done
+  const all=[...offices.map(o=>({...o,type:'office'})),...stations.map(s=>({...s,type:'station'}))];
+  document.getElementById('tab-count-done').textContent=all.filter(l=>calcPct(l.steps)===100).length;
+  // step tabs
+  STEP_TABS.forEach((t,i)=>{
+    const count=all.filter(l=>stepToggleOn?l.steps[i]===2:l.steps[i]<2).length;
+    document.getElementById('tab-count-'+t).textContent=count;
+  });
+}
+
+function renderStatusTabs(){
+  updateAllTabCounts();
+  renderStatusList();
+}
+
 function renderStatusList() {
   const data=getTabData(currentTab), c=document.getElementById('status-list');
   document.getElementById('status-count-badge').textContent=data.length+' แห่ง';
@@ -679,7 +742,34 @@ function renderStatusList() {
     </div>`;
   }).join('');
 }
-function switchTab(tab){currentTab=tab;document.querySelectorAll('.status-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));renderStatusList();}
+
+function switchTab(tab){
+  currentTab=tab;
+  // active style
+  document.querySelectorAll('.status-tab').forEach(b=>{
+    const isDone=b.dataset.tab==='done';
+    const isActive=b.dataset.tab===tab;
+    b.classList.remove('active');
+    if(isActive){
+      b.classList.add('active');
+      if(isDone){
+        b.style.background='#ECFDF5'; b.style.color='#065F46'; b.style.borderColor='#6EE7B7';
+        b.querySelector('.tab-dot').style.background='#10B981';
+      } else {
+        b.style.background='#EFF6FF'; b.style.color='#1e40af'; b.style.borderColor='#93c5fd';
+        b.querySelector('.tab-dot').style.background='#0066CC';
+      }
+    } else {
+      b.style.background=''; b.style.color=''; b.style.borderColor='';
+      if(!isDone) b.querySelector('.tab-dot').style.background='#64748B';
+    }
+  });
+  // toggle row
+  const tr=document.getElementById('step-toggle-row');
+  tr.style.display=tab==='done'?'none':'flex';
+  updateAllTabCounts();
+  renderStatusList();
+}
 
 let searchHighlightIdx=-1, searchResults=[];
 function onSearch(val){

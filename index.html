@@ -504,8 +504,8 @@ async function initDashboard() {
     rebuildOverviewHTML();
     currentTab = 'done';
 
-    document.getElementById('office-grid').innerHTML  = offices.map(o=>renderLocCard(o,'office')).join('');
-    document.getElementById('station-grid').innerHTML = stations.map(s=>renderLocCard(s,'station')).join('');
+    document.getElementById('office-grid').innerHTML  = offices.map((o,i)=>renderLocCard(o,'office',i+1)).join('');
+    document.getElementById('station-grid').innerHTML = stations.map((s,i)=>renderLocCard(s,'station',i+1)).join('');
 
     renderSplitCols();
     renderDonutSection();
@@ -533,7 +533,7 @@ function getStatusLabel(steps) {
 function stepClass(v) { return v===2?'done':v===1?'active':'pending'; }
 const stepColors = { done:'#10B981', active:'#F97316', pending:'#E2E8F0' };
 
-function renderLocCard(loc, type) {
+function renderLocCard(loc, type, seqNum) {
   const pct=calcPct(loc.steps), sc=getStatusClass(loc.steps);
   const isS=type==='station';
   const short=['สำรวจ','รื้อถอน','ขออนุมัติ','ขายทอดตลาด','นำออกบัญชี'];
@@ -542,7 +542,7 @@ function renderLocCard(loc, type) {
   let badgeCls=sc; if(sc==='in-progress'&&loc.steps.findIndex(s=>s<2)===1) badgeCls='step2';
   return `<div class="loc-card" onclick="showDetail('${loc.id}','${type}')">
     <div class="loc-header">
-      <div class="loc-num ${isS?'station':''}">${loc.id.replace(/[a-z]/g,'')}</div>
+      <div class="loc-num ${isS?'station':''}">${seqNum}</div>
       <div>
         <div class="loc-name">${loc.name}</div>
         <div class="loc-province">📍 ${loc.province}</div>

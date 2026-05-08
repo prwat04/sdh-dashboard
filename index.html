@@ -651,7 +651,7 @@ function renderDetail(id, type) {
 
 function calcGroupStats(list) {
   const t=list.length, d=list.filter(l=>calcPct(l.steps)===100).length, p=list.filter(l=>calcPct(l.steps)===0).length;
-  return {total:t, done:d, inProgress:t-d-p, pending:p, pct:Math.round(list.reduce((s,l)=>s+calcPct(l.steps),0)/t)};
+  return {total:t, done:d, inProgress:t-d-p, pending:p, pct:Math.round(d/t*100)};
 }
 function stepPillClass(list,i) { return list.every(l=>l.steps[i]===2)?'done':list.every(l=>l.steps[i]===0)?'pending':'in-progress'; }
 function pillLabel(cls,sh) { return cls==='done'?`✓ ${sh}`:cls==='in-progress'?`⟳ ${sh}`:`○ ${sh}`; }
@@ -677,7 +677,7 @@ function renderSplitCols() {
 function renderDonutSection() {
   const all=[...offices,...stations], t=all.length;
   const d=all.filter(l=>calcPct(l.steps)===100).length, p=all.filter(l=>calcPct(l.steps)===0).length, ip=t-d-p;
-  const oPct=Math.round(all.reduce((s,l)=>s+calcPct(l.steps),0)/t);
+  const oPct=Math.round(d/t*100);
   const C=2*Math.PI*46, dl=+(C*d/t).toFixed(1), il=+(C*ip/t).toFixed(1), pl=+(C*p/t).toFixed(1), off=C/4;
   document.getElementById('overview-donut-section').innerHTML=`
     <div class="card-header" style="margin-bottom:16px;"><span class="card-title">สถานะภาพรวมทั้งหมด</span><span class="card-badge">${t} แห่ง</span></div>

@@ -580,6 +580,18 @@ async function initDashboard() {
 document.addEventListener('DOMContentLoaded', initDashboard);
 
 
+function calcPct(steps) { return Math.round(steps.reduce((a,b)=>a+b,0)/(steps.length*2)*100); }
+function getStatusClass(steps) { const p=calcPct(steps); return p===100?'done':p===0?'pending':'in-progress'; }
+function getStatusLabel(steps) {
+  const p=calcPct(steps);
+  if(p===100) return 'เสร็จสมบูรณ์';
+  if(p===0) return 'ยังไม่เริ่ม';
+  const i=steps.findIndex(s=>s<2);
+  return `ขั้นที่ ${i+1}: ${STEPS[i]}`;
+}
+function stepClass(v) { return v===2?'done':v===1?'active':'pending'; }
+const stepColors = { done:'#10B981', active:'#F97316', pending:'#E2E8F0' };
+
 function renderLocGrid(list, type) {
   // Group by province
   const groups = {};
@@ -610,17 +622,6 @@ function renderLocGrid(list, type) {
       </div>`;
   }).join('');
 }
-
-function getStatusClass(steps) { const p=calcPct(steps); return p===100?'done':p===0?'pending':'in-progress'; }
-function getStatusLabel(steps) {
-  const p=calcPct(steps);
-  if(p===100) return 'เสร็จสมบูรณ์';
-  if(p===0) return 'ยังไม่เริ่ม';
-  const i=steps.findIndex(s=>s<2);
-  return `ขั้นที่ ${i+1}: ${STEPS[i]}`;
-}
-function stepClass(v) { return v===2?'done':v===1?'active':'pending'; }
-const stepColors = { done:'#10B981', active:'#F97316', pending:'#E2E8F0' };
 
 function renderLocCard(loc, type, seqNum) {
   const pct=calcPct(loc.steps), sc=getStatusClass(loc.steps);

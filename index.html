@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/502112/Downloads/sdh-dashboard_22.html -->
-<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard จำหน่ายอุปกรณ์ SDH | กฟภ.</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --pea-red: #C8102E;
@@ -258,7 +259,7 @@
       <div class="search-wrap" id="search-wrap">
         <div class="search-box" id="search-box">
           <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" placeholder="ค้นหาสำนักงาน / สถานีไฟฟ้า..." autocomplete="off" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)">
+          <input type="text" id="search-input" placeholder="ค้นหาสำนักงาน / สถานีไฟฟ้า..." autocomplete="off" oninput="onSearch(this.value)" onkeydown="onSearchKey(event)"/>
           <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
         </div>
         <div class="search-dropdown" id="search-dropdown"></div>
@@ -269,27 +270,69 @@
 </div>
 
 <div class="breadcrumb" id="breadcrumb">
-  <span onclick="showView(&#39;overview&#39;)" class="active">📊 ภาพรวม</span>
+  <span onclick="showView('overview')" class="active">📊 ภาพรวม</span>
 </div>
 
 <div class="main">
 
   <div class="view active" id="view-overview">
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center;">
-      <div style="font-size:40px;">⚠️</div>
-      <div style="font-size:16px;font-weight:700;color:#0F172A;">โหลดข้อมูลไม่สำเร็จ</div>
-      <div style="font-size:13px;color:#94A3B8;max-width:400px;">ไม่สามารถเชื่อมต่อ Google Sheet ได้<br>กรุณาตรวจสอบ internet หรือ URL ของ Sheet แล้วลองใหม่<br><small style="color:#CBD5E1">Failed to fetch</small></div>
-      <button onclick="initDashboard()" style="padding:10px 24px;background:#0066CC;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Sarabun,sans-serif;">ลองใหม่อีกครั้ง</button>
-    </div></div>
+    <div class="split-overview">
+      <div class="split-col office" onclick="showView('offices')">
+        <div class="split-col-header">
+          <div class="split-col-icon">🏢</div>
+          <div class="split-col-title"><h3>สำนักงานการไฟฟ้า</h3><p>กดเพื่อดูรายละเอียดแต่ละแห่ง</p></div>
+          <div class="split-total-badge" id="office-total-badge"></div>
+        </div>
+        <div class="split-col-body" id="office-col-body"></div>
+      </div>
+      <div class="split-col station" onclick="showView('stations')">
+        <div class="split-col-header">
+          <div class="split-col-icon">⚡</div>
+          <div class="split-col-title"><h3>สถานีไฟฟ้า</h3><p>กดเพื่อดูรายละเอียดแต่ละแห่ง</p></div>
+          <div class="split-total-badge" id="station-total-badge"></div>
+        </div>
+        <div class="split-col-body" id="station-col-body"></div>
+      </div>
+    </div>
+
+    <div class="overview-grid">
+      <div class="card" style="display:flex;flex-direction:column;gap:24px;">
+        <div id="overview-donut-section"></div>
+        <div style="height:1px;background:var(--border);"></div>
+        <div id="overview-step-section"></div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;">
+        <div class="card-header" style="margin-bottom:14px;">
+          <span class="card-title">รายการตามสถานะ</span>
+          <span class="card-badge" id="status-count-badge">59 แห่ง</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="status-tab active" data-tab="done" onclick="switchTab('done')">
+            <span class="tab-dot" style="background:#10B981"></span>ดำเนินการแล้วเสร็จ
+            <span class="tab-count" id="tab-count-done"></span>
+          </button>
+          <button class="status-tab" data-tab="in-progress" onclick="switchTab('in-progress')">
+            <span class="tab-dot" style="background:#F97316"></span>อยู่ระหว่างดำเนินการ
+            <span class="tab-count" id="tab-count-in-progress"></span>
+          </button>
+          <button class="status-tab" data-tab="pending" onclick="switchTab('pending')">
+            <span class="tab-dot" style="background:#CBD5E1"></span>ยังไม่ดำเนินการ
+            <span class="tab-count" id="tab-count-pending"></span>
+          </button>
+        </div>
+        <div id="status-list" style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:340px;"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="view" id="view-offices">
-    <button class="back-btn" onclick="showView(&#39;overview&#39;)">← กลับภาพรวม</button>
+    <button class="back-btn" onclick="showView('overview')">← กลับภาพรวม</button>
     <div class="section-title">สำนักงานการไฟฟ้า — รายแห่ง</div>
     <div class="location-grid" id="office-grid"></div>
   </div>
 
   <div class="view" id="view-stations">
-    <button class="back-btn" onclick="showView(&#39;overview&#39;)">← กลับภาพรวม</button>
+    <button class="back-btn" onclick="showView('overview')">← กลับภาพรวม</button>
     <div class="section-title">สถานีไฟฟ้า — รายแห่ง</div>
     <div class="location-grid" id="station-grid"></div>
   </div>
@@ -338,11 +381,13 @@ function statusToStep(val) {
 }
 
 function rowToLoc(row, prefix, idx) {
-  // B=1, C=2, E=4, F=5, G=6, H=7, I=8, J=9, K=10
+  // A=0 (running no), B=1 (ชื่อ), C=2 (จังหวัด), D=3, E=4 (จำนวน), F=5 (มูลค่า), G=6..K=10
   const name     = (row[1]||'').trim();
   const province = (row[2]||'').trim();
   const assets   = parseInt((row[4]||'0').replace(/,/g,''))||0;
-  const value    = (row[5]||'').trim().replace(/,/g,'') || '-';
+  // มูลค่า: เก็บตัวเลขล้วน แล้ว format ใส่ comma ตอน display
+  const rawVal   = (row[5]||'').trim().replace(/,/g,'').replace(/"/g,'');
+  const value    = rawVal && !isNaN(rawVal) ? Number(rawVal).toLocaleString('th-TH') : '-';
   const steps    = [row[6],row[7],row[8],row[9],row[10]].map(statusToStep);
   const note     = [row[6],row[7],row[8],row[9],row[10]].map(v=>(v||'ยังไม่ดำเนินการ').trim());
   if(!name) return null;
@@ -674,6 +719,5 @@ function updateBreadcrumb(view){
 
 
 </script>
-
-
-</body></html>
+</body>
+</html>

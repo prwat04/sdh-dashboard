@@ -362,13 +362,13 @@
   <div class="view" id="view-offices">
     <button class="back-btn" onclick="showView('overview')">← กลับภาพรวม</button>
     <div class="section-title">สำนักงานการไฟฟ้า — รายแห่ง</div>
-    <div class="location-grid" id="office-grid"></div>
+    <div id="office-grid"></div>
   </div>
 
   <div class="view" id="view-stations">
     <button class="back-btn" onclick="showView('overview')">← กลับภาพรวม</button>
     <div class="section-title">สถานีไฟฟ้า — รายแห่ง</div>
-    <div class="location-grid" id="station-grid"></div>
+    <div id="station-grid"></div>
   </div>
 
   <div class="view" id="view-detail">
@@ -561,8 +561,8 @@ async function initDashboard() {
     rebuildOverviewHTML();
     currentTab = 'done';
 
-    document.getElementById('office-grid').innerHTML  = offices.map((o,i)=>renderLocCard(o,'office',i+1)).join('');
-    document.getElementById('station-grid').innerHTML = stations.map((s,i)=>renderLocCard(s,'station',i+1)).join('');
+    document.getElementById('office-grid').innerHTML  = renderLocGrid(offices, 'office');
+    document.getElementById('station-grid').innerHTML = renderLocGrid(stations, 'station');
 
     renderSplitCols();
     renderDonutSection();
@@ -580,7 +580,37 @@ async function initDashboard() {
 document.addEventListener('DOMContentLoaded', initDashboard);
 
 
-function calcPct(steps) { return Math.round(steps.reduce((a,b)=>a+b,0)/(steps.length*2)*100); }
+function renderLocGrid(list, type) {
+  // Group by province
+  const groups = {};
+  list.forEach((loc, i) => {
+    if(!groups[loc.province]) groups[loc.province] = [];
+    groups[loc.province].push({...loc, seqNum: i+1});
+  });
+
+  return Object.entries(groups).map(([province, locs]) => {
+    const total = locs.length;
+    const done  = locs.filter(l => calcPct(l.steps) === 100).length;
+    const pct   = Math.round(done / total * 100);
+    const cards = locs.map(loc => renderLocCard(loc, type, loc.seqNum)).join('');
+    const color = type === 'office' ? '#0066CC' : '#00897B';
+    const doneBadge = done > 0
+      ? `<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#F0FDF4;color:#16A34A;border:1px solid #BBF7D0;">✓ เสร็จ ${pct}%</span>`
+      : `<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:#F8FAFC;color:#94A3B8;border:1px solid #E2E8F0;">เสร็จ 0%</span>`;
+    return `
+      <div style="margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:4px;height:22px;background:linear-gradient(180deg,${color},${color}99);border-radius:2px;flex-shrink:0;"></div>
+          <span style="font-size:15px;font-weight:800;color:#0F172A;">📍 ${province}</span>
+          <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:${type==='office'?'#EFF6FF':'#F0FDFA'};color:${color};border:1px solid ${type==='office'?'#BFDBFE':'#99F6E4'};">${total} แห่ง</span>
+          ${doneBadge}
+          <div style="flex:1;height:1px;background:linear-gradient(90deg,#E2E8F0,transparent);"></div>
+        </div>
+        <div class="location-grid">${cards}</div>
+      </div>`;
+  }).join('');
+}
+
 function getStatusClass(steps) { const p=calcPct(steps); return p===100?'done':p===0?'pending':'in-progress'; }
 function getStatusLabel(steps) {
   const p=calcPct(steps);
